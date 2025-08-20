@@ -1,6 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Interactive AI Resume
+
+This is an interactive personal profile web app for [melihcoskun.ai]. It features a profile photo and a chat interface that answers questions about Melih Coskun using AI (RAG) and text-to-speech.
+
+### Tech Stack
+- **Frontend:** Next.js (React 18), Chakra UI
+- **Deployment:** Vercel
+- **Backend API:** AWS Lambda (planned)
+- **AI:** OpenAI APIs (planned)
+
+### Features
+- Large profile avatar and personal info
+- Chat interface for asking questions
+- (Planned) RAG-powered answers about Melih Coskun
+- (Planned) Text-to-speech responses
+
+### Folder Structure
+- `public/assets/` — Static assets (profile photo, images)
+- `src/app/` — Main app code
+- `src/components/` — Reusable UI components
+
+### Getting Started
 
 ## Getting Started
+
 
 First, run the development server:
 
@@ -16,7 +38,13 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+You can start editing the homepage by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
+
+To update your profile photo, place a JPG or PNG in `public/assets/` and update the avatar `src` in `page.tsx`.
+
+### Contributing
+Pull requests and issues are welcome! Please keep assets under 1MB and use Git LFS for large files.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
