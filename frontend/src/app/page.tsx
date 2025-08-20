@@ -10,11 +10,44 @@ export default function Home() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages([...messages, { role: "user", content: input }]);
+    const userMessage = { role: "user", content: input };
+    setMessages(prev => [...prev, userMessage]);
     setInput("");
-    // Here you would call your backend API and add the response to messages
+
+    // Call mock API
+    try {
+      const res = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: input })
+      });
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: "assistant", content: data.answer }]);
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        const speakWithMaleVoice = () => {
+          const utterance = new window.SpeechSynthesisUtterance(data.answer);
+          const voices = window.speechSynthesis.getVoices();
+          // Log voices for debugging
+          // console.log(voices);
+          // Try to find a male voice by common male names or keywords
+          const maleVoice = voices.find(v =>
+            ["male", "man", "john", "david", "mike", "paul", "daniel", "james", "robert", "richard", "william", "george", "charles", "thomas", "joseph", "frank", "henry", "jack", "peter", "gary", "steven", "kevin", "brian", "edward", "ronald", "anthony", "mark", "donald", "kenneth", "stephen", "andrew", "joshua", "chris", "matt", "alex", "ryan", "nick", "sam", "greg", "bruce", "jeff", "scott", "eric", "adam", "ben", "luke", "leo", "max", "vince", "victor", "martin", "philip", "tim", "tom", "jerry", "fred", "arthur", "albert", "harry", "jim", "joe", "bob", "bill", "steve", "michael", "jason", "justin", "nathan", "patrick", "sean", "tyler", "zach", "aaron", "carl", "craig", "derek", "doug", "geoff", "ian", "jake", "jeremy", "jon", "kyle", "larry", "matthew", "neil", "paul", "randy", "ray", "roger", "ron", "ross", "shawn", "stuart", "todd", "trevor", "wayne", "wes", "will", "zane"].some(keyword => v.name.toLowerCase().includes(keyword))
+          );
+          if (maleVoice) utterance.voice = maleVoice;
+          window.speechSynthesis.speak(utterance);
+        };
+        // If voices are not loaded yet, wait for them
+        if (window.speechSynthesis.getVoices().length === 0) {
+          window.speechSynthesis.onvoiceschanged = speakWithMaleVoice;
+        } else {
+          speakWithMaleVoice();
+        }
+      }
+    } catch (err) {
+      setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong." }]);
+    }
   };
 
   return (
