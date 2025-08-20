@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@chakra-ui/react": "^3.25.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "framer-motion": "^12.23.12"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2"
+  }
+}
