@@ -14,6 +14,7 @@ export default function Home() {
   const SITE_KEY = "6LcJtq8rAAAAALjhwdkvfjWK4aTCstzfMOGHqpVz"; // Replace with your actual site key
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
+  console.log("API_URL from env:", API_URL);
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
   const [questionCount, setQuestionCount] = useState(0);
