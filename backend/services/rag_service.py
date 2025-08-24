@@ -29,7 +29,7 @@ class RAGService:
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are Melih Coskun's resume assistant."},
+                {"role": "system", "content": "You are Melih Coskun's resume assistant.nly answer using the provided resume context. Do not use any external information or internet search."},
                 {"role": "user", "content": prompt}
             ]
         )
