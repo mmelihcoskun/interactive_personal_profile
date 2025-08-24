@@ -1,12 +1,19 @@
 "use client";
 import { Box, Heading, Text, VStack, Input, Button, Avatar, ChakraProvider } from "@chakra-ui/react";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({});
 
 export default function Home() {
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaCompleted, setCaptchaCompleted] = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const SITE_KEY = "6LcJtq8rAAAAALjhwdkvfjWK4aTCstzfMOGHqpVz"; // Replace with your actual site key
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
   const [questionCount, setQuestionCount] = useState(0);
@@ -15,17 +22,26 @@ export default function Home() {
   const handleSend = async () => {
   if (!input.trim()) return;
   if (questionCount >= MAX_QUESTIONS) return;
+  // Require CAPTCHA only for the first question
+  if (questionCount === 0 && !captchaToken) {
+    setMessages(prev => [...prev, { role: "assistant", content: "Please complete the CAPTCHA." }]);
+    return;
+  }
     const userMessage = { role: "user", content: input };
   setMessages(prev => [...prev, userMessage]);
   setInput("");
   setQuestionCount(count => count + 1);
 
-    // Call real backend API
+    // Call AWS API Gateway backend
     try {
-      const res = await fetch("http://localhost:8000/ask", {
+      // Only send captcha for the first question
+      const res = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: input })
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY
+        },
+        body: JSON.stringify({ question: input, captcha: questionCount === 0 ? captchaToken : undefined })
       });
       const data = await res.json();
       setMessages(prev => [...prev, { role: "assistant", content: data.answer }]);
@@ -45,6 +61,12 @@ export default function Home() {
         } else {
           speakWithMaleVoice();
         }
+      }
+      // After first question, mark CAPTCHA as completed and disable widget
+      if (questionCount === 0) {
+        setCaptchaCompleted(true);
+        if (recaptchaRef.current) recaptchaRef.current.reset();
+        setCaptchaToken(null);
       }
     } catch (err) {
       setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong." }]);
@@ -73,6 +95,17 @@ export default function Home() {
                       </Text>
                     </Box>
                   ))
+                )}
+              </Box>
+              <Box mb={2}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={SITE_KEY}
+                  {...(!captchaCompleted ? { onChange: (token) => setCaptchaToken(token) } : {})}
+                  style={captchaCompleted ? { pointerEvents: "none", opacity: 0.5 } : {}}
+                />
+                {captchaCompleted && (
+                  <Text color="green.500" fontSize="sm">CAPTCHA completed for this session.</Text>
                 )}
               </Box>
               <Box display="flex" gap={2}>
