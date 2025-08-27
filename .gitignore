@@ -34,3 +34,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+*/resume/
+*./template.yaml
+samconfig.toml
+template.yaml
+*.vscode/
+.aws-sam/
+interactive_personal_profile/backend/api/__pycache__/
+interactive_personal_profile/backend/models/__pycache__/
+interactive_personal_profile/backend/repositories/__pycache__/
+interactive_personal_profile/backend/services/__pycache__/
+interactive_personal_profile/backend/utils/__pycache__/
+*/__pycache__/
+api/__pycache__/
+services/__pycache__/
+
