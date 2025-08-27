@@ -8,7 +8,7 @@ from repositories.supabase_repository import SupabaseRepository
 load_env()
 
 RESUME_DIR = os.getenv("RESUME_DIR", "resume")  # Default folder name
-CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 500))  # Number of characters per chunk
+CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 800))  # Number of characters per chunk
 SUPABASE_TABLE = os.getenv("SUPABASE_TABLE", "resume_chunks")
 
 def read_resume_files(folder):
