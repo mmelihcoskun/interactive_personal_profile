@@ -1,8 +1,8 @@
+
 import os
 import sys
 from utils.env_loader import load_env
-from utils.openai_client import get_embedding
-from repositories.supabase_repository import SupabaseRepository
+from services.resume_service import ResumeService
 
 # Load environment variables
 load_env()
@@ -19,31 +19,56 @@ def read_resume_files(folder):
                 texts.append(f.read())
     return "\n".join(texts)
 
-def chunk_text(text, chunk_size):
-    return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+
+import re
+
+def smart_chunk_markdown(md_text, max_chunk_size=1200):
+    # 1. Extract About section as a single chunk
+    about_match = re.search(r'(## About Melih[\s\S]*?)(?=^## |\Z)', md_text, re.MULTILINE)
+    chunks = []
+    if about_match:
+        chunks.append(about_match.group(1).strip())
+    # 2. Find all other ## sections
+    sections = re.split(r'(?m)^## ', md_text)
+    for section in sections:
+        section = section.strip()
+        if not section or section.startswith('About Melih'):
+            continue
+        # If section is short, add as single chunk
+        if len(section) < max_chunk_size:
+            chunks.append(section)
+        else:
+            # 3. For sections with bullets, chunk each top bullet with its child bullets
+            # Find top-level bullets (lines starting with '- ')
+            bullets = re.split(r'(?m)^- ', section)
+            for bullet in bullets:
+                bullet = bullet.strip()
+                if bullet:
+                    chunks.append(bullet)
+    return [chunk for chunk in chunks if chunk]
 
 def main():
     folder = RESUME_DIR
     if not os.path.exists(folder):
         print(f"Resume folder '{folder}' not found.")
         sys.exit(1)
-    repo = SupabaseRepository()
-    if not repo.is_table_empty(SUPABASE_TABLE):
-        print(f"Vector DB table '{SUPABASE_TABLE}' is not empty. Resume already loaded.")
-        return
-    print(f"Loading resume files from: {folder}")
     text = read_resume_files(folder)
-    chunks = chunk_text(text, CHUNK_SIZE)
-    print(f"Total chunks: {len(chunks)}")
+    chunks = smart_chunk_markdown(text)
+    print(f"Smart chunking produced {len(chunks)} chunks.")
+    from utils.openai_client import get_embedding
+    from repositories.supabase_repository import SupabaseRepository
+    repo = SupabaseRepository()
+    # Optionally clear table before loading
+    # if not repo.is_table_empty(SUPABASE_TABLE):
+    #     print(f"Vector DB table '{SUPABASE_TABLE}' is not empty. Resume already loaded.")
+    #     return
     for idx, chunk in enumerate(chunks):
         print(f"Embedding chunk {idx+1}/{len(chunks)}...")
         embedding = get_embedding(chunk)
-        # Upsert into Supabase
-        repo.upsert_embedding(
-            table=SUPABASE_TABLE,
-            chunk=chunk,
+        repo.upsert_resume_chunk(
+            chunk_id=idx,
             embedding=embedding,
-            metadata={"chunk_index": idx}
+            text=chunk
         )
         print(f"Chunk {idx+1} upserted.")
     print("All chunks loaded and embedded.")
