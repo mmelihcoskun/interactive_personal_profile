@@ -81,7 +81,7 @@ export default function Home() {
           <Box textAlign="center">
             <Avatar boxSize="200px" name="Melih Coskun" src="/assets/avatar.png" mb={4} />
             <Heading as="h1" size="lg">Melih Coskun</Heading>
-            <Text color="gray.600">AI-powered interactive resume</Text>
+            <Text color="gray.600">AI-powered interactive chatbot about me</Text>
           </Box>
           <Box bg="white" p={6} rounded="lg" shadow="md">
             <VStack spacing={4} align="stretch">
