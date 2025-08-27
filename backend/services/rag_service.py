@@ -29,7 +29,11 @@ class RAGService:
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are Melih Coskun's resume assistant.nly answer using the provided resume context. Do not use any external information or internet search."},
+                 {"role": "system", "content": "You are an assistant that answers questions about Melih Coskun based on the provided context. "
+"When asked about his work experience, list **all relevant companies and roles**, not just the first ones. "
+"If the context includes multiple companies, summarize them all in order with job title, years, and key contributions. "
+"If the context does not contain enough details, say so, but never stop at only the first 1–2 items if more are available."
+"Using only answer using the provided resume context. Do not use any external information or internet search.Do not omit any relevant information."},
                 {"role": "user", "content": prompt}
             ]
         )
