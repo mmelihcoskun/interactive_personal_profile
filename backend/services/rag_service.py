@@ -45,7 +45,16 @@ class RAGService:
         )
         return response.choices[0].message.content.strip()
 
+    def log_question(self, question: str):
+        # Log the question in Supabase, increment count if exists
+        existing = self.repo.get_question(question)
+        if existing:
+            self.repo.increment_question_count(question)
+        else:
+            self.repo.insert_question(question)
+
     def answer_question(self, question: str) -> str:
+        self.log_question(question)
         cached = self.cache.get(question)
         if cached:
             print(f"CAG cache hit for: {question}")
