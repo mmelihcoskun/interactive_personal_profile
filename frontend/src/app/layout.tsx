@@ -1,6 +1,8 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-// Removed ChakraProvider import; will use in page.tsx Client Component
+import { ChakraProvider } from '@chakra-ui/react';
+import Navbar from '../components/Navbar';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-  {children}
+        <ChakraProvider>
+          <Navbar />
+          {children}
+        </ChakraProvider>
       </body>
     </html>
   );

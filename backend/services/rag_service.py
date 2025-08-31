@@ -38,14 +38,24 @@ class RAGService:
 "1. Identify all companies and roles mentioned in the context, starting from the most recent to the oldest (reverse chronological order).\n"
 "2. For each position, list the job title, years, company, and key contributions.\n"
 "3. Summarize all positions in reverse chronological order.\n"
-"4. If the context does not contain enough details, state that, but never stop at only the first 1–2 items if more are available.\n"
+"4. if summary is too long, make it more clear and concise. summary should be shorter without loosing the context.\n"
+"5. If the context does not contain enough details, state that, but never stop at only the first 1–2 items if more are available.\n"
 "Use only the provided resume context. Do not use any external information or internet search. Do not omit any relevant information."},
                 {"role": "user", "content": prompt}
             ]
         )
         return response.choices[0].message.content.strip()
 
+    def log_question(self, question: str):
+        # Log the question in Supabase, increment count if exists
+        existing = self.repo.get_question(question)
+        if existing:
+            self.repo.increment_question_count(question)
+        else:
+            self.repo.insert_question(question)
+
     def answer_question(self, question: str) -> str:
+        self.log_question(question)
         cached = self.cache.get(question)
         if cached:
             print(f"CAG cache hit for: {question}")
