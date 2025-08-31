@@ -176,7 +176,7 @@ If you’re curious about my thoughts on AI and technology, take a look at my Me
           </Box>
           <Box
             minH="180px"
-            maxH={{ base: '60vh', md: '240px' }}
+             maxH={{ base: '60vh', md: '50vh' }}
             px={2}
             py={2}
             bg="gray.100"
