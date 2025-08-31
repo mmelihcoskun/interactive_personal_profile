@@ -2,12 +2,14 @@
 // Add global type for grecaptcha
 declare global {
   interface Window {
-    grecaptcha?: any;
+    grecaptcha?: {
+      execute: (siteKey: string, options: object) => Promise<string>;
+    };
   }
 }
-import { Box, Heading, Text, VStack, Input, Button, Avatar, ChakraProvider } from "@chakra-ui/react";
+import { Box, Heading, Text, Input, Button, Avatar, ChakraProvider } from "@chakra-ui/react";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 // import ReCAPTCHA from "react-google-recaptcha";
 import { useEffect } from "react";
 import { extendTheme } from "@chakra-ui/react";
@@ -16,7 +18,7 @@ const theme = extendTheme({});
 
 export default function Home() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaCompleted, setCaptchaCompleted] = useState(false);
+  // Removed unused captchaCompleted
   // Invisible reCAPTCHA v3
   const SITE_KEY = "6LcJtq8rAAAAALjhwdkvfjWK4aTCstzfMOGHqpVz"; // Replace with your actual site key
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
@@ -71,9 +73,8 @@ export default function Home() {
         }
       }
       if (questionCount === 0) {
-        setCaptchaCompleted(true);
       }
-    } catch (err) {
+    } catch {
       setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong." }]);
     }
   };
