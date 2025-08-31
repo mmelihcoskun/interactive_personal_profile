@@ -36,7 +36,7 @@ export default function AboutMeCard() {
         <a href="https://linkedin.com/in/melihcoskun" target="_blank" rel="noopener noreferrer">
           <Avatar src="/assets/linkedin.svg" name="LinkedIn" size="md" bg="white" />
         </a>
-        <a href="https://medium.com/@mmelihcoskun" target="_blank" rel="noopener noreferrer">
+        <a href="https://medium.com/@coskunmelih" target="_blank" rel="noopener noreferrer">
           <Avatar src="/assets/medium.svg" name="Medium" size="md" bg="white" />
         </a>
         <a href="https://github.com/mmelihcoskun" target="_blank" rel="noopener noreferrer">

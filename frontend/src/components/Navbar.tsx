@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Flex, HStack, Link, IconButton, useDisclosure, VStack, useColorModeValue } from '@chakra-ui/react';
+import Image from 'next/image';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -27,10 +28,13 @@ export default function Navbar() {
   <Box as="nav" bg={navBg} px={4} py={2} color="teal.700" boxShadow={navShadow} borderRadius="md" borderBottom={`0.5px solid ${navBorder}`}> 
       <Flex h={16} alignItems="center" justifyContent="space-between">
         <Box display="flex" alignItems="center">
-          <img
+          <Image
             src="/assets/avatar.png"
             alt="MC Logo"
-            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 0 4px rgba(0,0,0,0.08)', marginRight: '16px' }}
+            width={40}
+            height={40}
+            style={{ borderRadius: '50%', objectFit: 'cover', boxShadow: '0 0 4px rgba(0,0,0,0.08)', marginRight: '16px' }}
+            priority
           />
           <span
             style={{
