@@ -40,7 +40,8 @@ class RAGService:
 "3. Summarize all positions in reverse chronological order.\n"
 "4. if summary is too long, make it more clear and concise. summary should be shorter without loosing the context.\n"
 "5. If the context does not contain enough details, state that, but never stop at only the first 1–2 items if more are available.\n"
-"Use only the provided resume context. Do not use any external information or internet search. Do not omit any relevant information."},
+"Use only the provided resume context. Do not use any external information or internet search. Do not omit any relevant information.\n"
+"Always answer in one short, direct sentence or sentences unless the user explicitly asks for more detail."},
                 {"role": "user", "content": prompt}
             ]
         )

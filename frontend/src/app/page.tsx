@@ -174,15 +174,42 @@ If you’re curious about my thoughts on AI and technology, take a look at my Me
             <Heading as="h2" size="md" color="teal.700" mb={1}>Ask my AI Assistant about me</Heading>
             <Text color="gray.500" fontSize="md">Powered by AI to answer your questions about my career, skills, and projects.</Text>
           </Box>
-          <Box minH="180px" px={2} py={2} bg="gray.100" rounded="xl" borderWidth="2px" borderColor="teal.100" boxShadow="md">
+          <Box
+            minH="180px"
+            maxH={{ base: '60vh', md: '240px' }}
+            px={2}
+            py={2}
+            bg="gray.100"
+            rounded="xl"
+            borderWidth="2px"
+            borderColor="teal.100"
+            boxShadow="md"
+            overflowY="auto"
+            transition="max-height 0.3s"
+          >
             {messages.length === 0 ? (
               <Text color="gray.400">Ask me anything about myself! (Max {MAX_QUESTIONS} questions per session)</Text>
             ) : (
               messages.map((msg, idx) => (
-                <Box key={idx} mb={2} textAlign={msg.role === "user" ? "right" : "left"}>
-                  <Text fontWeight={msg.role === "user" ? "bold" : "normal"}>
+                <Box
+                  key={idx}
+                  mb={2}
+                  display="flex"
+                  justifyContent={msg.role === "user" ? "flex-end" : "flex-start"}
+                >
+                  <Box
+                    px={3}
+                    py={2}
+                    borderRadius="lg"
+                    maxW="80%"
+                    bg={msg.role === "user" ? "teal.50" : "white"}
+                    color={msg.role === "user" ? "teal.700" : "gray.700"}
+                    fontWeight={msg.role === "user" ? "bold" : "normal"}
+                    boxShadow={msg.role === "user" ? "sm" : "none"}
+                    border={msg.role === "user" ? "1px solid #81e6d9" : "1px solid #e2e8f0"}
+                  >
                     {msg.content}
-                  </Text>
+                  </Box>
                 </Box>
               ))
             )}
