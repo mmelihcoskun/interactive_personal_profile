@@ -4,6 +4,7 @@ declare global {
   interface Window {
     grecaptcha?: {
       execute: (siteKey: string, options: object) => Promise<string>;
+      ready: (cb: () => void) => void;
     };
   }
 }
@@ -94,9 +95,9 @@ export default function Home() {
       script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
       script.async = true;
       script.onload = () => {
-        if (window.grecaptcha && typeof (window.grecaptcha as any).ready === "function") {
-          (window.grecaptcha as any).ready(() => {
-            (window.grecaptcha as any).execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+        if (window.grecaptcha && typeof window.grecaptcha.ready === "function") {
+          window.grecaptcha.ready(() => {
+            window.grecaptcha!.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
               setCaptchaToken(token);
             });
           });
@@ -104,15 +105,15 @@ export default function Home() {
       };
       document.body.appendChild(script);
     } else if (typeof window !== "undefined" && window.grecaptcha) {
-      const grecaptchaAny = window.grecaptcha as any;
-      if (typeof grecaptchaAny.ready === "function") {
-        grecaptchaAny.ready(async () => {
-          const token = await grecaptchaAny.execute(SITE_KEY, { action: "submit" });
-          setCaptchaToken(token);
+      if (typeof window.grecaptcha.ready === "function") {
+        window.grecaptcha.ready(() => {
+          window.grecaptcha!.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+            setCaptchaToken(token);
+          });
         });
       } else {
         // Fallback: execute directly
-        grecaptchaAny.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+        window.grecaptcha!.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
           setCaptchaToken(token);
         });
       }
