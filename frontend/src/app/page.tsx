@@ -29,6 +29,8 @@ export default function Home() {
   const [questionCount, setQuestionCount] = useState(0);
   const MAX_QUESTIONS = 5;
 
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+
   const handleSend = async () => {
     if (!input.trim()) return;
     if (questionCount >= MAX_QUESTIONS) return;
@@ -38,6 +40,9 @@ export default function Home() {
       if (typeof window !== "undefined" && window.grecaptcha) {
         token = await window.grecaptcha.execute(SITE_KEY, { action: "submit" });
         setCaptchaToken(token);
+      } else {
+        // reCAPTCHA not ready
+        return;
       }
     }
     const userMessage = { role: "user", content: input };
@@ -85,7 +90,10 @@ export default function Home() {
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
       script.async = true;
+      script.onload = () => setRecaptchaReady(true);
       document.body.appendChild(script);
+    } else if (typeof window !== "undefined" && window.grecaptcha) {
+      setRecaptchaReady(true);
     }
   }, []);
 
@@ -234,7 +242,7 @@ If you’re curious about my thoughts on AI and technology, take a look at my Me
               isDisabled={questionCount >= MAX_QUESTIONS}
               flex={1}
             />
-            <Button colorScheme="teal" size="lg" px={8} height="56px" borderRadius="xl" fontWeight="bold" onClick={handleSend} isDisabled={questionCount >= MAX_QUESTIONS}>Send</Button>
+            <Button colorScheme="teal" size="lg" px={8} height="56px" borderRadius="xl" fontWeight="bold" onClick={handleSend} isDisabled={questionCount >= MAX_QUESTIONS || (questionCount === 0 && !recaptchaReady)}>Send</Button>
           </Box>
           {/* Invisible reCAPTCHA v3, no visible widget */}
         </Box>
