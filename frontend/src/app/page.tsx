@@ -87,13 +87,35 @@ export default function Home() {
     }
   };
 
-  // Load reCAPTCHA v3 script
+  // Load reCAPTCHA v3 script and preload token
   useEffect(() => {
     if (typeof window !== "undefined" && !window.grecaptcha) {
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
       script.async = true;
+      script.onload = () => {
+        if (window.grecaptcha && typeof (window.grecaptcha as any).ready === "function") {
+          (window.grecaptcha as any).ready(() => {
+            (window.grecaptcha as any).execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+              setCaptchaToken(token);
+            });
+          });
+        }
+      };
       document.body.appendChild(script);
+    } else if (typeof window !== "undefined" && window.grecaptcha) {
+      const grecaptchaAny = window.grecaptcha as any;
+      if (typeof grecaptchaAny.ready === "function") {
+        grecaptchaAny.ready(async () => {
+          const token = await grecaptchaAny.execute(SITE_KEY, { action: "submit" });
+          setCaptchaToken(token);
+        });
+      } else {
+        // Fallback: execute directly
+        grecaptchaAny.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+          setCaptchaToken(token);
+        });
+      }
     }
   }, []);
 
