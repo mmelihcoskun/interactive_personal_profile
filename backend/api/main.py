@@ -18,7 +18,7 @@ def verify_recaptcha(token: str) -> bool:
         return False
 
 # Simple in-memory rate limit: max 5 requests per IP per hour
-RATE_LIMIT = 5
+RATE_LIMIT = 20
 RATE_LIMIT_WINDOW = 3600  # seconds
 rate_limit_cache = {}
 from fastapi import FastAPI, Request
