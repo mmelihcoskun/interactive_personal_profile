@@ -4,6 +4,7 @@ declare global {
   interface Window {
     grecaptcha?: {
       execute: (siteKey: string, options: object) => Promise<string>;
+      ready: (cb: () => void) => void;
     };
   }
 }
@@ -87,13 +88,35 @@ export default function Home() {
     }
   };
 
-  // Load reCAPTCHA v3 script
+  // Load reCAPTCHA v3 script and preload token
   useEffect(() => {
     if (typeof window !== "undefined" && !window.grecaptcha) {
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
       script.async = true;
+      script.onload = () => {
+        if (window.grecaptcha && typeof window.grecaptcha.ready === "function") {
+          window.grecaptcha.ready(() => {
+            window.grecaptcha!.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+              setCaptchaToken(token);
+            });
+          });
+        }
+      };
       document.body.appendChild(script);
+    } else if (typeof window !== "undefined" && window.grecaptcha) {
+      if (typeof window.grecaptcha.ready === "function") {
+        window.grecaptcha.ready(() => {
+          window.grecaptcha!.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+            setCaptchaToken(token);
+          });
+        });
+      } else {
+        // Fallback: execute directly
+        window.grecaptcha!.execute(SITE_KEY, { action: "submit" }).then((token: string) => {
+          setCaptchaToken(token);
+        });
+      }
     }
   }, []);
 
