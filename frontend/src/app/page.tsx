@@ -65,24 +65,6 @@ export default function Home() {
       });
       const data = await res.json();
       setMessages(prev => [...prev, { role: "assistant", content: data.answer }]);
-      if (typeof window !== "undefined" && window.speechSynthesis) {
-        const speakWithMaleVoice = () => {
-          const utterance = new window.SpeechSynthesisUtterance(data.answer);
-          const voices = window.speechSynthesis.getVoices();
-          const maleVoice = voices.find(v =>
-            ["male", "man", "john", "david", "mike", "paul", "daniel", "james", "robert", "richard", "william", "george", "charles", "thomas", "joseph", "frank", "henry", "jack", "peter", "gary", "steven", "kevin", "brian", "edward", "ronald", "anthony", "mark", "donald", "kenneth", "stephen", "andrew", "joshua", "chris", "matt", "alex", "ryan", "nick", "sam", "greg", "bruce", "jeff", "scott", "eric", "adam", "ben", "luke", "leo", "max", "vince", "victor", "martin", "philip", "tim", "tom", "jerry", "fred", "arthur", "albert", "harry", "jim", "joe", "bob", "bill", "steve", "michael", "jason", "justin", "nathan", "patrick", "sean", "tyler", "zach", "aaron", "carl", "craig", "derek", "doug", "geoff", "ian", "jake", "jeremy", "jon", "kyle", "larry", "matthew", "neil", "paul", "randy", "ray", "roger", "ron", "ross", "shawn", "stuart", "todd", "trevor", "wayne", "wes", "will", "zane"].some(keyword => v.name.toLowerCase().includes(keyword))
-          );
-          if (maleVoice) utterance.voice = maleVoice;
-          window.speechSynthesis.speak(utterance);
-        };
-        if (window.speechSynthesis.getVoices().length === 0) {
-          window.speechSynthesis.onvoiceschanged = speakWithMaleVoice;
-        } else {
-          speakWithMaleVoice();
-        }
-      }
-      if (questionCount === 0) {
-      }
     } catch {
       setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong." }]);
     }
