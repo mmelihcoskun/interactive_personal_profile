@@ -8,7 +8,9 @@ export default function AboutMeCard() {
       rounded={{ base: '2xl', md: '2xl 0 0 2xl' }}
       boxShadow="xl"
       mb={0}
-      height="auto"
+      height={{ base: 'auto', md: '100vh' }}
+      minHeight={{ base: 'auto', md: '100vh' }}
+      maxHeight={{ base: 'auto', md: '100vh' }}
       display="flex"
       flexDirection="column"
       alignItems="center"

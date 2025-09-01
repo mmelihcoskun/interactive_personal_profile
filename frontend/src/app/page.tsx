@@ -18,37 +18,40 @@ const theme = extendTheme({});
 
 export default function Home() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  // Removed unused captchaCompleted
+  // Mock mode toggle
+  const USE_MOCK = false; // Set to false to use real API
   // Invisible reCAPTCHA v3
   const SITE_KEY = "6LcJtq8rAAAAALjhwdkvfjWK4aTCstzfMOGHqpVz"; // Replace with your actual site key
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
-  console.log("API_URL from env:", API_URL);
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
   const [questionCount, setQuestionCount] = useState(0);
   const MAX_QUESTIONS = 5;
 
-  const [recaptchaReady, setRecaptchaReady] = useState(false);
-
   const handleSend = async () => {
     if (!input.trim()) return;
     if (questionCount >= MAX_QUESTIONS) return;
     let token = captchaToken;
+    const userMessage = { role: "user", content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setQuestionCount(count => count + 1);
+    if (USE_MOCK) {
+      // Mock response logic
+      const mockText = "asdddsasadasfefqfqe3gqegeqgweqgqggqwqfdqdwqdwqdwqdwqwdqdqwdwqqwdqdwqwddqwewgewrgwegwegwegwegwegewgewgwegwegewgwegwegwegwegewgewgwegwegewgewgwegwegewggewgewgewweggewewgweegwgewewgewgewewfwefewfewfwefwefwefwewwefewfeewffweçkjlkewhjgljwefjweljfşwejfjweopgjowejgoşjewoşgjwşogjo";
+      setTimeout(() => {
+        setMessages(prev => [...prev, { role: "assistant", content: mockText }]);
+      }, 500);
+      return;
+    }
     // Use invisible reCAPTCHA v3 for first question
     if (questionCount === 0) {
       if (typeof window !== "undefined" && window.grecaptcha) {
         token = await window.grecaptcha.execute(SITE_KEY, { action: "submit" });
         setCaptchaToken(token);
-      } else {
-        // reCAPTCHA not ready
-        return;
       }
     }
-    const userMessage = { role: "user", content: input };
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setQuestionCount(count => count + 1);
     // Call AWS API Gateway backend
     try {
       const res = await fetch(API_URL, {
@@ -90,10 +93,7 @@ export default function Home() {
       const script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`;
       script.async = true;
-      script.onload = () => setRecaptchaReady(true);
       document.body.appendChild(script);
-    } else if (typeof window !== "undefined" && window.grecaptcha) {
-      setRecaptchaReady(true);
     }
   }, []);
 
@@ -177,24 +177,27 @@ If you’re curious about my thoughts on AI and technology, take a look at my Me
           </a>
         </Box>
         {/* Chatbot section for mobile only, merged into card */}
-  <Box w="100%" mt={4} display={{ base: "block", md: "none" }} flex="1" minH="calc(100vh - 320px)">
+  <Box w="100%" mt={4} display={{ base: "block", md: "none" }} flex="1" minH="calc(100vh - 320px)" position="relative" height="calc(100vh - 320px)">
           <Box textAlign="center" mb={2}>
             <Heading as="h2" size="md" color="teal.700" mb={1}>Ask my AI Assistant about me</Heading>
             <Text color="gray.500" fontSize="md">Powered by AI to answer your questions about my career, skills, and projects.</Text>
           </Box>
-          <Box
-            minH="180px"
-             maxH={{ base: '60vh', md: '50vh' }}
-            px={2}
-            py={2}
-            bg="gray.100"
-            rounded="xl"
-            borderWidth="2px"
-            borderColor="teal.100"
-            boxShadow="md"
-            overflowY="auto"
-            transition="max-height 0.3s"
-          >
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          px={2}
+          py={2}
+          bg="gray.100"
+          rounded="xl"
+          borderWidth="2px"
+          borderColor="teal.100"
+          boxShadow="md"
+          overflowY="auto"
+          height="calc(100vh - 320px - 80px)"
+        >
             {messages.length === 0 ? (
               <Text color="gray.400">Ask me anything about myself! (Max {MAX_QUESTIONS} questions per session)</Text>
             ) : (
@@ -222,7 +225,23 @@ If you’re curious about my thoughts on AI and technology, take a look at my Me
               ))
             )}
           </Box>
-          <Box display="flex" gap={2} justifyContent="center" alignItems="center" pt={2}>
+          <Box
+            display={{ base: "flex", md: "none" }}
+            gap={2}
+            justifyContent="center"
+            alignItems="center"
+            position="fixed"
+            left={0}
+            right={0}
+            bottom={0}
+            width="100vw"
+            bg="white"
+            px={4}
+            py={2}
+            zIndex={10}
+            boxShadow="md"
+            height="80px"
+          >
             <Input
               size="lg"
               height="56px"
@@ -242,7 +261,7 @@ If you’re curious about my thoughts on AI and technology, take a look at my Me
               isDisabled={questionCount >= MAX_QUESTIONS}
               flex={1}
             />
-            <Button colorScheme="teal" size="lg" px={8} height="56px" borderRadius="xl" fontWeight="bold" onClick={handleSend} isDisabled={questionCount >= MAX_QUESTIONS || (questionCount === 0 && !recaptchaReady)}>Send</Button>
+            <Button colorScheme="teal" size="lg" px={8} height="56px" borderRadius="xl" fontWeight="bold" onClick={handleSend} isDisabled={questionCount >= MAX_QUESTIONS}>Send</Button>
           </Box>
           {/* Invisible reCAPTCHA v3, no visible widget */}
         </Box>
@@ -267,7 +286,7 @@ If you’re curious about my thoughts on AI and technology, take a look at my Me
             <Heading as="h2" size="md" color="teal.700" mb={1}>Ask my AI Assistant about me</Heading>
             <Text color="gray.500" fontSize="md">Powered by AI to answer your questions about my career, skills, and projects.</Text>
           </Box>
-          <Box minH="180px" px={2} py={2} bg="gray.100" rounded="xl" borderWidth="2px" borderColor="teal.100" boxShadow="md">
+          <Box minH="320px" maxH="480px" px={2} py={2} bg="gray.100" rounded="xl" borderWidth="2px" borderColor="teal.100" boxShadow="md" overflowY="auto">
             {messages.length === 0 ? (
               <Text color="gray.400">Ask me anything about myself! (Max {MAX_QUESTIONS} questions per session)</Text>
             ) : (
